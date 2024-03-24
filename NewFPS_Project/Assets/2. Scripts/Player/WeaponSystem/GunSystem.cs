@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using EZCameraShake;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GunSystem : MonoBehaviour
 {
@@ -29,6 +32,9 @@ public class GunSystem : MonoBehaviour
    [Space(10f),Header("Graphic Reference")]
    public GameObject muzzleFlashPrefab, bulletHoleGraphicPrefab;
    public Text ammoText;
+
+   public CameraShaker camShaker;
+   public float camShakeMagnitude, camShakeDuration;
    
    // 키 입력
    public KeyCode reloadKey = KeyCode.R;
@@ -42,21 +48,21 @@ public class GunSystem : MonoBehaviour
 
    private void Update()
    {
-      
+      PlayerInput();
    }
 
-   private void CheckInput()
+   private void PlayerInput()
    {
       shooting = allowButtonHold ? Input.GetKey(shootingKey) : Input.GetKeyDown(shootingKey);
 
       if (Input.GetKeyDown(reloadKey) && bulletsLeft < magazineSize && !reloading)
       {
-         // 재장전 메서드
+         StartCoroutine(Reload());
       }
 
       if (readyToShoot && shooting && !reloading && bulletsLeft > 0)
       {
-         // 사격 메서드
+         Shoot();
       }
    }
 
@@ -64,7 +70,86 @@ public class GunSystem : MonoBehaviour
    {
       readyToShoot = false;
       bulletShot = 0;
+
+      Vector3 directionWithSpread = CalculateDirectionWithSpread();
+
+      // 오브젝트 풀에서 총알 인스턴스 가져옴
+      GameObject currentBullet = ObjectPool.Spawn(bullet, attackPoint.position, quaternion.identity);
+      currentBullet.transform.forward = directionWithSpread.normalized;
       
+      // 총알에 힘 적용
+      currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+      currentBullet.GetComponent<Rigidbody>().AddForce(cam.transform.up * upwardForce, ForceMode.Impulse);
+
+      // 카메라 흔들림
+      camShaker.ShakeOnce(camShakeMagnitude, .5f, camShakeDuration, camShakeDuration);
       
+      bulletsLeft--;
+      bulletShot++;
+
+      if (muzzleFlashPrefab != null)
+      {
+         muzzleFlashPrefab.SetActive(true);
+
+         StartCoroutine(ReturnMuzzleFlash(.1f));
+      }
+
+      if (bulletShot < bulletsPerTap && bulletsLeft > 0)
+      {
+         StartCoroutine(ShootWithDelay(timeBetweenShooting));
+      }
+      else
+      {
+         StartCoroutine(ResetShot(timeBetweenShooting));
+      }
    }
+
+   private IEnumerator ReturnMuzzleFlash(float delay)
+   {
+      yield return new WaitForSeconds(delay);
+      muzzleFlashPrefab.SetActive(false);
+   }
+
+   private IEnumerator ShootWithDelay(float delay)
+   {
+      yield return new WaitForSeconds(delay);
+      Shoot();
+   }
+
+   // 발사 상태 복구
+   private IEnumerator ResetShot(float delay)
+   {
+      yield return new WaitForSeconds(delay);
+      readyToShoot = true; 
+   }
+
+   private IEnumerator Reload()
+   {
+      reloading = true;
+
+      yield return new WaitForSeconds(reloadTime);
+      bulletsLeft = magazineSize;   // 탄창 다시 Full
+      reloading = false;
+   }
+
+   // 랜덤 탄퍼짐 구현 
+   private Vector3 CalculateDirectionWithSpread()
+   {
+      Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+      RaycastHit hit;
+
+      // 레이캐스트가 hit 되면 그 위치 or 지정한 거리만큼 멀리 있는 지점 좌표
+      Vector3 targetPoint = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(75);
+      
+      // 총알 발사 지점에서 타겟 지점까지의 방향 
+      Vector3 directionWithoutSpread = targetPoint - attackPoint.position;
+      
+      // 탄퍼짐
+      float x = Random.Range(-spread, spread);
+      float y = Random.Range(-spread, spread);
+
+      // 기존 방향에 탄퍼짐을 추가한 최종 방향 리턴
+      return directionWithoutSpread + new Vector3(x, y, 0);
+   }
+
 }

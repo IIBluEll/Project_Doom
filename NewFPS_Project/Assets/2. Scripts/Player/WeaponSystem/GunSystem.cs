@@ -76,6 +76,11 @@ public class GunSystem : MonoBehaviour
       // 오브젝트 풀에서 총알 인스턴스 가져옴
       GameObject currentBullet = ObjectPool.Spawn(bullet, attackPoint.position, quaternion.identity);
       currentBullet.transform.forward = directionWithSpread.normalized;
+
+      if (currentBullet == null)
+      {
+         Debug.Log("총알이 Null 입니다");
+      }
       
       // 총알에 힘 적용
       currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
@@ -91,7 +96,7 @@ public class GunSystem : MonoBehaviour
       {
          muzzleFlashPrefab.SetActive(true);
 
-         StartCoroutine(ReturnMuzzleFlash(.1f));
+         StartCoroutine(ReturnMuzzleFlash(.05f));
       }
 
       if (bulletShot < bulletsPerTap && bulletsLeft > 0)

@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix;
+using Sirenix.Serialization;
 
 public class ObjectPool : SingleTon<ObjectPool>
 {
@@ -14,9 +17,11 @@ public class ObjectPool : SingleTon<ObjectPool>
     }
     
     // 키는 프리팹, 값은 해당 프리팹의 인스턴스 큐.
-    Dictionary<GameObject, Queue<GameObject>> pooledObjects = new Dictionary<GameObject, Queue<GameObject>>();
+    [NonSerialized ,OdinSerialize]
+    public Dictionary<GameObject, Queue<GameObject>> pooledObjects = new Dictionary<GameObject, Queue<GameObject>>();
     // 현재 활성화된 오브젝트와 그 원본 프리팹을 매핑하는 사전.
-    Dictionary<GameObject, GameObject> spawnedObjects = new Dictionary<GameObject, GameObject>();
+    [NonSerialized ,OdinSerialize]
+    public Dictionary<GameObject, GameObject> spawnedObjects = new Dictionary<GameObject, GameObject>();
     
     public PoolItem[] Pools;
     
@@ -35,6 +40,7 @@ public class ObjectPool : SingleTon<ObjectPool>
     // 오브젝트 풀 생성
     private IEnumerator CreatePoolsCo()
     {
+        Debug.Log("New Pool Make");
         foreach (var pool in Pools)
         {
             CreatePool(pool.prefab, pool.size); // 각 프리팹에 대한 풀을 생성
@@ -83,6 +89,7 @@ public class ObjectPool : SingleTon<ObjectPool>
         }
         else
         {   // 풀에 사용 가능한 오브젝트가 없다면 새로 생성
+            Debug.Log("풀에서 사용할 오브젝트가 부족합니다.");
             var obj = Instantiate(prefab, position, rotation);
             Instance.spawnedObjects.Add(obj, prefab);   // 스폰된 오브젝트 목록에 추가
             return obj;
@@ -95,11 +102,13 @@ public class ObjectPool : SingleTon<ObjectPool>
         // 오브젝트가 스폰된 오브젝트 목록에 있는지 확인
         if (Instance.spawnedObjects.TryGetValue(obj, out GameObject prefab))
         {
+            Debug.Log($"Obj : {obj} // Prefeb : {prefab}");
             // 오브젝트를 비활성화하고 풀로 다시 반환
             obj.SetActive(false);
             Instance.spawnedObjects.Remove(obj);
             Instance.pooledObjects[prefab].Enqueue(obj);
-            obj.transform.SetParent(Instance.transform);
+         
+            //obj.transform.SetParent(Instance.transform);
         }
         else
         {

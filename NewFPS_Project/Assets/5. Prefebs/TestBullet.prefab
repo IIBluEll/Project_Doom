@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 5378084908052355910}
   - component: {fileID: 2243684459534648822}
   - component: {fileID: 8404282799185262379}
+  - component: {fileID: 1443020563776591302}
   m_Layer: 0
   m_Name: TestBullet
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -63,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 9d47161692b0c32438cc6e534d1cb730, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,3 +134,28 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &1443020563776591302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810919395588772422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96dd976fbc001c84194fb985c3bf9422, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 8404282799185262379}
+  explosion: {fileID: 0}
+  enemy:
+    serializedVersion: 2
+    m_Bits: 8
+  bounciness: 0.4
+  userGravity: 0
+  explosionDamage: 40
+  explosionRange: 0
+  explosionForce: 0
+  setMaxCollisions: 1
+  setMaxLifeTime: 5
+  isExplodeBullet: 0

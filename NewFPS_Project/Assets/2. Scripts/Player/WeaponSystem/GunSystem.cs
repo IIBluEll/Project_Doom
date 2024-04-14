@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using EZCameraShake;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -36,25 +37,61 @@ public class GunSystem : MonoBehaviour
    public CameraShaker camShaker;
    public float camShakeMagnitude, camShakeDuration;
    
+   // 정조준 기능
+   public Transform gunHolder;
+   public Vector3 aimPosition;
+   public Vector3 originalPosition;
+   
    // 키 입력
    public KeyCode reloadKey = KeyCode.R;
    public KeyCode shootingKey = KeyCode.Mouse0;
+   public KeyCode trueAimKey = KeyCode.Mouse1;
+   
+   public bool isTrueAim = false;
 
    private void Awake()
    {
       bulletsLeft = magazineSize;
       readyToShoot = true;
+
+      originalPosition = gunHolder.localPosition;
    }
 
    private void Update()
    {
       PlayerInput();
+      HandleAiming();
+   }
+
+   private void HandleAiming()
+   {
+      if (Input.GetKeyDown(trueAimKey))
+      {
+         StartAiming();
+      }
+
+      if (Input.GetKeyUp(trueAimKey))
+      {
+         StopAiming();
+      }
+   }
+
+   private void StartAiming()
+   {
+      isTrueAim = true;
+      gunHolder.localPosition = aimPosition;
+   }
+
+   private void StopAiming()
+   {
+      isTrueAim = false;
+      gunHolder.localPosition = originalPosition;
    }
 
    private void PlayerInput()
    {
       shooting = allowButtonHold ? Input.GetKey(shootingKey) : Input.GetKeyDown(shootingKey);
-
+      
       if (Input.GetKeyDown(reloadKey) && bulletsLeft < magazineSize && !reloading)
       {
          StartCoroutine(Reload());
@@ -65,22 +102,26 @@ public class GunSystem : MonoBehaviour
          Shoot();
       }
    }
-
+   
    private void Shoot()
    {
       readyToShoot = false;
       bulletShot = 0;
 
-      Vector3 directionWithSpread = CalculateDirectionWithSpread();
+      Vector3 directionWithSpread;
+      
+      if (isTrueAim)
+      {
+         directionWithSpread = CalculateDirectionWithSpread(0);
+      }
+      else
+      {
+         directionWithSpread = CalculateDirectionWithSpread(spread);
+      }
 
       // 오브젝트 풀에서 총알 인스턴스 가져옴
       GameObject currentBullet = ObjectPool.Spawn(bullet, attackPoint.position, quaternion.identity);
       currentBullet.transform.forward = directionWithSpread.normalized;
-
-      if (currentBullet == null)
-      {
-         Debug.Log("총알이 Null 입니다");
-      }
       
       // 총알에 힘 적용
       currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
@@ -138,7 +179,7 @@ public class GunSystem : MonoBehaviour
    }
 
    // 랜덤 탄퍼짐 구현 
-   private Vector3 CalculateDirectionWithSpread()
+   private Vector3 CalculateDirectionWithSpread(float spread)
    {
       Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
       RaycastHit hit;

@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 public class GunSystem : MonoBehaviour
 {
    public GameObject bullet;                                                  // 총알 프리펩
-   
+   public GameObject bulletCasing;                                            // 탄피 프피펩
    // 총기 스탯
    [Header("Gun Stats")]
    public float shootForce, upwardForce;                                      // 총알 발사 힘, 상향 힘
@@ -28,6 +28,7 @@ public class GunSystem : MonoBehaviour
    public Rigidbody playerRb;
    public Camera cam;
    public Transform attackPoint;
+   public Transform bulletCasingPoint;
    
    // 그래픽
    [Space(10f),Header("Graphic Reference")]
@@ -120,13 +121,17 @@ public class GunSystem : MonoBehaviour
       }
 
       // 오브젝트 풀에서 총알 인스턴스 가져옴
-      GameObject currentBullet = ObjectPool.Spawn(bullet, attackPoint.position, quaternion.identity);
+      GameObject currentBullet = ObjectPool.Spawn(bullet, attackPoint.position, Quaternion.identity);
       currentBullet.transform.forward = directionWithSpread.normalized;
       
       // 총알에 힘 적용
       currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
       currentBullet.GetComponent<Rigidbody>().AddForce(cam.transform.up * upwardForce, ForceMode.Impulse);
 
+      // 탄피 생성
+      GameObject currentCasing = ObjectPool.Spawn(bulletCasing, bulletCasingPoint.position, quaternion.identity);
+      currentCasing.GetComponent<BulletCasing>().SetUpBulletCasing(bulletCasingPoint.transform.right);
+      
       // 카메라 흔들림
       camShaker.ShakeOnce(camShakeMagnitude, .5f, camShakeDuration, camShakeDuration);
       

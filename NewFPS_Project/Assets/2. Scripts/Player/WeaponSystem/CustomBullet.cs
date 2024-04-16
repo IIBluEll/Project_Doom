@@ -53,7 +53,7 @@ public class CustomBullet : MonoBehaviour
             bounceCombine = PhysicMaterialCombine.Maximum
         };
         
-        GetComponent<SphereCollider>().material = physics_mat;
+        GetComponent<CapsuleCollider>().material = physics_mat;
     }
 
     private void OnEnable()

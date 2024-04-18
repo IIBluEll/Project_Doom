@@ -58,10 +58,14 @@ public class GunSystem : MonoBehaviour
    public AudioClip armingSFX;
 
    private AudioSource audioSource;
+   private Animator animator;
+   private PlayerMove playerMove;
    
    private void Awake()
    {
       audioSource = GetComponent<AudioSource>();
+      animator = GetComponent<Animator>();
+      playerMove = GameObject.Find("Player").GetComponent<PlayerMove>();
       
       bulletsLeft = magazineSize;
       readyToShoot = true;
@@ -71,13 +75,20 @@ public class GunSystem : MonoBehaviour
 
    private void Update()
    {
+      animator.SetFloat("MoveSpeed",playerMove.moveSpeed);
+      
+      if (Input.GetKey(KeyCode.LeftShift))
+      {
+         return;
+      }
+      
       PlayerInput();
       HandleAiming();
    }
 
    private void HandleAiming()
    {
-      if (Input.GetKeyDown(trueAimKey) && !Input.GetKey(KeyCode.LeftShift))
+      if (Input.GetKeyDown(trueAimKey))
       {
          StartAiming();
       }
@@ -87,17 +98,20 @@ public class GunSystem : MonoBehaviour
          StopAiming();
       }
    }
-
+   
    private void StartAiming()
    {
+      animator.SetTrigger("Hold");
       isTrueAim = true;
       gunHolder.localPosition = aimPosition;
+      animator.SetBool("IsHolding",true);
    }
 
    private void StopAiming()
    {
       isTrueAim = false;
       gunHolder.localPosition = originalPosition;
+      animator.SetBool("IsHolding",false);
    }
 
    private void PlayerInput()
@@ -106,6 +120,11 @@ public class GunSystem : MonoBehaviour
       
       if (Input.GetKeyDown(reloadKey) && bulletsLeft < magazineSize && !reloading)
       {
+         if (isTrueAim)
+         {
+            StopAiming();
+         }
+         
          StartCoroutine(Reload());
       }
 
@@ -181,11 +200,14 @@ public class GunSystem : MonoBehaviour
 
    private IEnumerator Reload()
    {
+      animator.SetTrigger("Reload");
+      animator.SetBool("IsReloading",true);
       reloading = true;
 
       yield return new WaitForSeconds(reloadTime);
       bulletsLeft = magazineSize;   // 탄창 다시 Full
       reloading = false;
+      animator.SetBool("IsReloading",false);
    }
 
    // 랜덤 탄퍼짐 구현 

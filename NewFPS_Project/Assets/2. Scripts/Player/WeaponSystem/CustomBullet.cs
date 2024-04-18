@@ -124,6 +124,7 @@ public class CustomBullet : MonoBehaviour
     {
         if(other.collider.CompareTag("Bullet"))
         {
+            Debug.Log("Bullet_OnCollisionEnter - [ Bullet ]");
             return;
         }
         

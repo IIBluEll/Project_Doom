@@ -12,6 +12,7 @@ public class GunSystem : MonoBehaviour
 {
    public GameObject bullet;                                                  // 총알 프리펩
    public GameObject bulletCasing;                                            // 탄피 프피펩
+   
    // 총기 스탯
    [Header("Gun Stats")]
    public float shootForce, upwardForce;                                      // 총알 발사 힘, 상향 힘
@@ -49,9 +50,19 @@ public class GunSystem : MonoBehaviour
    public KeyCode trueAimKey = KeyCode.Mouse1;
    
    public bool isTrueAim = false;
+   
+   // 사운드
+   public AudioClip fireSFX;
+   public AudioClip clipOutSFX;
+   public AudioClip clipInSFX;
+   public AudioClip armingSFX;
 
+   private AudioSource audioSource;
+   
    private void Awake()
    {
+      audioSource = GetComponent<AudioSource>();
+      
       bulletsLeft = magazineSize;
       readyToShoot = true;
 
@@ -66,7 +77,7 @@ public class GunSystem : MonoBehaviour
 
    private void HandleAiming()
    {
-      if (Input.GetKeyDown(trueAimKey))
+      if (Input.GetKeyDown(trueAimKey) && !Input.GetKey(KeyCode.LeftShift))
       {
          StartAiming();
       }
@@ -109,16 +120,7 @@ public class GunSystem : MonoBehaviour
       readyToShoot = false;
       bulletShot = 0;
 
-      Vector3 directionWithSpread;
-      
-      if (isTrueAim)
-      {
-         directionWithSpread = CalculateDirectionWithSpread(0);
-      }
-      else
-      {
-         directionWithSpread = CalculateDirectionWithSpread(spread);
-      }
+      Vector3 directionWithSpread = CalculateDirectionWithSpread(isTrueAim);
 
       // 오브젝트 풀에서 총알 인스턴스 가져옴
       GameObject currentBullet = ObjectPool.Spawn(bullet, attackPoint.position, Quaternion.identity);
@@ -134,6 +136,9 @@ public class GunSystem : MonoBehaviour
       
       // 카메라 흔들림
       camShaker.ShakeOnce(camShakeMagnitude, .5f, camShakeDuration, camShakeDuration);
+
+      audioSource.clip = fireSFX;
+      audioSource.Play();
       
       bulletsLeft--;
       bulletShot++;
@@ -184,13 +189,13 @@ public class GunSystem : MonoBehaviour
    }
 
    // 랜덤 탄퍼짐 구현 
-   private Vector3 CalculateDirectionWithSpread(float spread)
+   private Vector3 CalculateDirectionWithSpread(bool trueAim)
    {
       Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
       RaycastHit hit;
 
       // 레이캐스트가 hit 되면 그 위치 or 지정한 거리만큼 멀리 있는 지점 좌표
-      Vector3 targetPoint = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(75);
+      Vector3 targetPoint = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(100);
       
       // 총알 발사 지점에서 타겟 지점까지의 방향 
       Vector3 directionWithoutSpread = targetPoint - attackPoint.position;
@@ -199,8 +204,14 @@ public class GunSystem : MonoBehaviour
       float x = Random.Range(-spread, spread);
       float y = Random.Range(-spread, spread);
 
+      if (trueAim)
+      {
+         return directionWithoutSpread;
+      }
+      
       // 기존 방향에 탄퍼짐을 추가한 최종 방향 리턴
       return directionWithoutSpread + new Vector3(x, y, 0);
+      
    }
 
 }

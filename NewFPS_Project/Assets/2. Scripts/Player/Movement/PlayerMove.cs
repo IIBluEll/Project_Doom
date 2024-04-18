@@ -7,17 +7,19 @@ public class PlayerMove : MonoBehaviour
 {
     [SerializeField] private Transform orientation;
 
+    public bool isPlayerDie = false;
+    
     // 플레이어 이동 속도 변수 선언
     [Header("Movement")]    
-    [SerializeField] private float moveSpeed = 4f;
-    [SerializeField] private float movementMultiplier = 10f;
-    [SerializeField] private float airMultiplier = 0.4f;
+    public float moveSpeed = 4f;
+    public float movementMultiplier = 10f;
+    public float airMultiplier = 0.4f;
 
     // 플레이어 걷기/뛰기 속도 변수 선언
     [Space(10), Header("Sprinting")]    
-    [SerializeField] private float walkSpeed = 4f;
-    [SerializeField] private float sprintSpeed = 6f;
-    [SerializeField] private float acceleration = 10f;
+    public float walkSpeed = 4f;
+    public float sprintSpeed = 6f;
+    public float acceleration = 10f;
     
     // 키보드 입력 변수 선언
     [Space(10), Header("Keybinds")]     
@@ -26,12 +28,12 @@ public class PlayerMove : MonoBehaviour
 
     // 플레이어 점프 힘 변수 선언
     [Space(10), Header("Jumping Power")]    
-    [SerializeField] private float jumpForce = 5f;
+    public float jumpForce = 5f;
 
     // 플레이어 마찰력 변수 선언
     [Space(10), Header("Drag")]         
-    [SerializeField] private float groundDrag = 6f;
-    [SerializeField] private float airDrag = 2f;
+    public float groundDrag = 6f;
+    public float airDrag = 2f;
 
     private const float PlayerHeight = 2f; 
     private const float SlopeCheckDistance = 0.5f; 
@@ -45,7 +47,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     public bool isGrounded;
     private float groundDistance = 0.4f;
-
+    
     private Vector3 moveDirection;
     private Vector3 slopeMoveDirection;
 
@@ -66,8 +68,14 @@ public class PlayerMove : MonoBehaviour
 
     private void Update()
     {
+        if (isPlayerDie)
+        {
+            return;
+        }
+        
         // 지면 감지
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        
         isOnSlope = OnSlope(); 
 
         PlayerInput();  // 입력 처리
@@ -89,6 +97,7 @@ public class PlayerMove : MonoBehaviour
         MovePlayer();
     }
 
+    
     // 플레이어가 경사면 위에 있는지 검사
     private bool OnSlope()
     {

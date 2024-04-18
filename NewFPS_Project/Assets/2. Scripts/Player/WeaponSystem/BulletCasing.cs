@@ -34,9 +34,6 @@ public class BulletCasing : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (!other.collider.CompareTag("Ground")) 
-            return;
-        
         audioSource.Play();
     }
 

@@ -236,4 +236,16 @@ public class GunSystem : MonoBehaviour
       
    }
 
+   public void OnClipInSound()
+   {
+      audioSource.clip = clipInSFX;
+      audioSource.Play();
+   }
+
+   public void OnClipOutSound()
+   {
+      audioSource.clip = clipOutSFX;
+      audioSource.Play();
+   }
+
 }

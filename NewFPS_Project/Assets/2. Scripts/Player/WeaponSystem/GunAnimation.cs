@@ -20,4 +20,6 @@ public class GunAnimation : MonoBehaviour
     {
         animator.SetFloat("MoveSpeed",playerMove.moveSpeed);
     }
+
+    
 }

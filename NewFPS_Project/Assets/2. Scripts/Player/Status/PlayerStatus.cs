@@ -3,91 +3,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-///  체력 / 스테미나 / 
-/// </summary>
-
-public class PlayerStatus : MonoBehaviour
+public class PlayerStatus : CharacterStatus
 {
-    protected int maxHP = 100;
-    protected int currentHP;
+    [SerializeField, Tooltip("위기 상태 체력 비율"), Range(0.01f, 1.0f)]
+    private float criticalHpRate = 0.3f;
 
-    protected bool isDead = false;
+    private bool isCritical;
 
-    public delegate void HpChangeHandler(int current, int max);
+    public event Action onEnterCritical;
+    public event Action onExitCritical;
 
-    public event HpChangeHandler OnHpChanged;
-    public event Action OnDead;
-    public event Action<int> OnDamaged;
-    public event Action<int> OnHealed;
-    
-    public int CurrentHP
+    public override void TakeDamage(int amount)
     {
-        get => currentHP;
-        set
+        base.TakeDamage(amount);
+
+        if (!isCritical && (float)currentHP / maxHP <= criticalHpRate)
         {
-            currentHP = value;
-
-            if (currentHP <= 0)
-            {
-                currentHP = 0;
-
-                if (!isDead)
-                {
-                    isDead = true;
-                    OnDead?.Invoke();
-                }
-            }
-            else if(currentHP > maxHP)
-            {
-                currentHP = maxHP;
-            }
-            
-            OnHpChanged?.Invoke(currentHP,maxHP);            
+            isCritical = true;
+            onEnterCritical?.Invoke();
         }
     }
 
-    public int MaxHP
+    public override void TakeHeal(int amount)
     {
-        get => maxHP;
-        set
+        base.TakeHeal(amount);
+
+        if (isCritical && (float)currentHP / maxHP > criticalHpRate)
         {
-            int changeAmount = Mathf.Max(value - maxHP, 0);
-            maxHP = value;
-            currentHP += changeAmount;
-            
-            OnHpChanged?.Invoke(currentHP,maxHP);
-        }
-    }
-
-    protected virtual void OnEnable()
-    {
-        currentHP = maxHP;
-        isDead = false;
-    }
-
-    private void Start()
-    {
-        // 초기 UI 갱신
-        CurrentHP = currentHP;
-    }
-
-    public virtual void TakeDamage(int amount)
-    {
-        CurrentHP -= amount;
-        if (!isDead)
-        {
-            OnDamaged?.Invoke(amount);
-        }
-    }
-
-    public virtual void TakeHeal(int amount)
-    {
-        CurrentHP += amount;
-
-        if (!isDead)
-        {
-            OnHealed?.Invoke(amount);
+            isCritical = false;
+            onExitCritical?.Invoke();
         }
     }
 }

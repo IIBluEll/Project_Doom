@@ -11,6 +11,7 @@ TagManager:
   - Concrete
   - Wood
   - Sand
+  - EnemyBullet
   layers:
   - Default
   - TransparentFX

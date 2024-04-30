@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,7 +31,7 @@ public class Bullet : MonoBehaviour
     public int setMaxCollisions;
     public float setMaxLifeTime;
     
-    private int collisions;
+    protected int collisions;
     private bool isDestroying = false;
     private PhysicMaterial physics_mat;
 
@@ -96,5 +97,21 @@ public class Bullet : MonoBehaviour
                 enemyRb.AddExplosionForce(explosionForce, transform.position, explosionRange);
             }
         }
+    }
+
+    protected virtual void BulletHit()
+    {
+        
+    }
+    
+    protected virtual void OnCollisionEnter(Collision other)
+    {
+        
+    }
+
+    protected void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position,explosionRange);
     }
 }

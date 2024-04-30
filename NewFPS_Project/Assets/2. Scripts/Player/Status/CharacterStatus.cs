@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class CharacterStatus : MonoBehaviour
 {
-    protected int maxHP = 100;
+    [SerializeField]protected int maxHP = 100;
     protected int currentHP;
 
     protected bool isDead = false;

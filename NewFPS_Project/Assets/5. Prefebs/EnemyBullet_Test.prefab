@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 5250892757594973182}
   - component: {fileID: 8757375152048178209}
   - component: {fileID: 6994726954878639508}
-  - component: {fileID: 3189708585953238442}
   - component: {fileID: 5852437005371582332}
   - component: {fileID: 7725609483966356709}
-  m_Layer: 8
+  - component: {fileID: -7871390730068128080}
+  m_Layer: 10
   m_Name: EnemyBullet_Test
   m_TagString: Bullet
   m_Icon: {fileID: 0}
@@ -86,31 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3189708585953238442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 76363676787176481}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96dd976fbc001c84194fb985c3bf9422, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 5852437005371582332}
-  explosion: {fileID: 0}
-  enemy:
-    serializedVersion: 2
-    m_Bits: 8
-  bounciness: 0.14
-  userGravity: 0
-  explosionDamage: 40
-  explosionRange: 0
-  explosionForce: 0
-  setMaxCollisions: 1
-  setMaxLifeTime: 5
-  isExplodeBullet: 0
 --- !u!54 &5852437005371582332
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -161,3 +136,29 @@ CapsuleCollider:
   m_Height: 0.017211203
   m_Direction: 1
   m_Center: {x: -0.000000006170012, y: -0.0003385135, z: 0.000000025145715}
+--- !u!114 &-7871390730068128080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76363676787176481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea5fc579e7c6a1b42bf9245a40784f7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 5852437005371582332}
+  explosion: {fileID: 0}
+  enemy:
+    serializedVersion: 2
+    m_Bits: 128
+  bounciness: 0.5
+  userGravity: 0
+  isExplodeBullet: 0
+  explosionDamage: 0
+  explosionRange: 0
+  explosionForce: 0
+  setMaxCollisions: 1
+  setMaxLifeTime: 5
+  BulletDamage: 30

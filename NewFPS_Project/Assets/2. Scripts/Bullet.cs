@@ -35,7 +35,7 @@ public class Bullet : MonoBehaviour
     private bool isDestroying = false;
     private PhysicMaterial physics_mat;
 
-    protected void OnEnable()
+    protected virtual void OnEnable()
     {
         maxCollisions = setMaxCollisions;
         maxLifeTime = setMaxLifeTime;
@@ -104,7 +104,7 @@ public class Bullet : MonoBehaviour
         
     }
     
-    protected virtual void OnCollisionEnter(Collision other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         
     }

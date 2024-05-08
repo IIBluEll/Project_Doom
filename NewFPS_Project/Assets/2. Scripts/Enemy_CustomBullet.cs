@@ -5,14 +5,20 @@ using UnityEngine;
 public class Enemy_CustomBullet : Bullet
 {
     public int BulletDamage;
-    protected override void OnCollisionEnter(Collision other)
+
+    protected override void OnEnable()
     {
-        if (other.collider.CompareTag("Bullet"))
+        base.OnEnable();
+    }
+    
+    protected override void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Bullet"))
         {
             return;
         }
 
-        if (other.collider.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
             Debug.Log("Player HIT!!!");
             if (isExplodeBullet)
@@ -20,11 +26,12 @@ public class Enemy_CustomBullet : Bullet
                 Explode();
             }
             
-            other.collider.GetComponent<PlayerStatus>().TakeDamage(BulletDamage);
+            other.GetComponent<PlayerStatus>().TakeDamage(BulletDamage);
             StartCoroutine(DestroyBullets(0));
         }
         else
         {
+            Debug.Log("EnemyBullet Hit [ " + other.name + " ]");
             collisions++;
         }
     }

@@ -8,9 +8,7 @@ using Random = UnityEngine.Random;
 public class Turret_GunShoot : MonoBehaviour
 {
     public GameObject enemyBullet;
-    public GameObject bulletCasing;
     public Transform attackPoint;
-    public Transform bulletCasingPoint;
     
     // 그래픽
     [Space(10f), Header("Graphic Reference")]
@@ -58,11 +56,7 @@ public class Turret_GunShoot : MonoBehaviour
         // 총알에 힘 적용
         currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
         currentBullet.GetComponent<Rigidbody>().AddForce(attackPoint.transform.up * upwardForce, ForceMode.Impulse);
-
-        // 탄피 생성
-        GameObject currentCasing = ObjectPool.Spawn(bulletCasing, bulletCasingPoint.position, quaternion.identity);
-        currentCasing.GetComponent<BulletCasing>().SetUpBulletCasing(bulletCasingPoint.transform.right);
-
+        
         bulletsLeft--;
         bulletShot++;
         

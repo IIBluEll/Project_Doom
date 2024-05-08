@@ -26,7 +26,7 @@ public class GunSystem : MonoBehaviour
    private bool shooting, readyToShoot, reloading;                            // 발사 중, 발사 준비 완료, 재장전 중
 
    [Space(10f), Header("Reference")] 
-   public Rigidbody playerRb;
+   //public Rigidbody playerRb;
    public Camera cam;
    public Transform attackPoint;
    public Transform bulletCasingPoint;
@@ -60,12 +60,15 @@ public class GunSystem : MonoBehaviour
    private AudioSource audioSource;
    private Animator animator;
    private PlayerMove playerMove;
-   
-   private void Awake()
+
+   private void OnEnable()
    {
       audioSource = GetComponent<AudioSource>();
       animator = GetComponent<Animator>();
-      playerMove = GameObject.Find("Player").GetComponent<PlayerMove>();
+      playerMove = GetComponentInParent<PlayerMove>();
+      camShaker = GetComponentInParent<CameraShaker>();
+      gunHolder = GameObject.Find("GunHolder").transform;
+      cam = Camera.main;
       
       bulletsLeft = magazineSize;
       readyToShoot = true;

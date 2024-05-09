@@ -12,6 +12,7 @@ TagManager:
   - Wood
   - Sand
   - EnemyBullet
+  - InteractiveRay
   layers:
   - Default
   - TransparentFX
